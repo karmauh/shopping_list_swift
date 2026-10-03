@@ -33,3 +33,9 @@ final class ProductCategory {
         CategoryColor(rawValue: colorName) ?? .gray
     }
 }
+
+extension ProductCategory {
+    var isFallback: Bool {
+        isDefault && name == "Inne" && symbolName == "ellipsis.circle.fill"
+    }
+}
