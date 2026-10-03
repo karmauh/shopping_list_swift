@@ -8,6 +8,7 @@ struct ShoppingListsView: View {
     private var lists: [ShoppingList]
 
     @State private var formMode: ListFormMode?
+    @State private var showsCategories = false
 
     var body: some View {
         List {
@@ -53,6 +54,13 @@ struct ShoppingListsView: View {
         }
         .navigationTitle("Listy zakupów")
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    showsCategories = true
+                } label: {
+                    Label("Kategorie", systemImage: "tag")
+                }
+            }
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     formMode = .add
@@ -63,6 +71,9 @@ struct ShoppingListsView: View {
         }
         .navigationDestination(for: ShoppingList.self) { list in
             ShoppingListDetailView(list: list)
+        }
+        .navigationDestination(isPresented: $showsCategories) {
+            CategoriesView()
         }
         .sheet(item: $formMode) { mode in
             ListFormView(mode: mode)
