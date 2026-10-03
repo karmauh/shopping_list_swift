@@ -8,18 +8,6 @@ struct ShoppingListsView: View {
     private var lists: [ShoppingList]
 
     @State private var formMode: ListFormMode?
-    @State private var listToDelete: ShoppingList?
-
-    private var showsDeleteConfirmation: Binding<Bool> {
-        Binding(
-            get: { listToDelete != nil },
-            set: { isPresented in
-                if !isPresented {
-                    listToDelete = nil
-                }
-            }
-        )
-    }
 
     var body: some View {
         List {
@@ -29,7 +17,7 @@ struct ShoppingListsView: View {
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
-                        listToDelete = list
+                        delete(list)
                     } label: {
                         Label("Usuń", systemImage: "trash")
                     }
@@ -47,7 +35,7 @@ struct ShoppingListsView: View {
                         Label("Zmień nazwę", systemImage: "pencil")
                     }
                     Button(role: .destructive) {
-                        listToDelete = list
+                        delete(list)
                     } label: {
                         Label("Usuń", systemImage: "trash")
                     }
@@ -79,17 +67,11 @@ struct ShoppingListsView: View {
         .sheet(item: $formMode) { mode in
             ListFormView(mode: mode)
         }
-        .confirmationDialog(
-            "Usunąć listę?",
-            isPresented: showsDeleteConfirmation,
-            titleVisibility: .visible,
-            presenting: listToDelete
-        ) { list in
-            Button("Usuń listę i jej produkty", role: .destructive) {
-                modelContext.delete(list)
-            }
-        } message: { list in
-            Text("Lista \(list.name) zostanie usunięta razem ze wszystkimi produktami (liczba produktów: \(list.totalCount)).")
+    }
+
+    private func delete(_ list: ShoppingList) {
+        withAnimation {
+            modelContext.delete(list)
         }
     }
 }
