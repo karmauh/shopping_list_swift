@@ -1,24 +1,20 @@
-//
-//  ContentView.swift
-//  ListaZakupow
-//
-//  Created by Mikołaj Bożko on 03/10/2026.
-//
-
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @Environment(\.modelContext) private var modelContext
 
-#Preview {
-    ContentView()
+    @Query private var categories: [ProductCategory]
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Text("Lista zakupów")
+                .font(.largeTitle.bold())
+            Text("Kategorie w bazie: \(categories.count)")
+                .foregroundStyle(.secondary)
+        }
+        .task {
+            DefaultCategories.seedIfNeeded(in: modelContext)
+        }
+    }
 }
