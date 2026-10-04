@@ -36,17 +36,11 @@ struct ShoppingListDetailView: View {
             ForEach(sections) { section in
                 Section {
                     ForEach(section.items) { item in
-                        ItemRow(
-                            item: item,
-                            onToggle: {
-                                withAnimation {
-                                    item.setPurchased(!item.isPurchased)
-                                }
-                            },
-                            onEdit: {
-                                formMode = .edit(item)
+                        ItemRow(item: item) {
+                            withAnimation {
+                                item.setPurchased(!item.isPurchased)
                             }
-                        )
+                        }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 withAnimation {

@@ -3,7 +3,6 @@ import SwiftUI
 struct ItemRow: View {
     let item: ShoppingItem
     let onToggle: () -> Void
-    let onEdit: () -> Void
 
     private var tint: Color {
         if item.isPurchased {
@@ -13,28 +12,28 @@ struct ItemRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            Button(action: onToggle) {
+        Button(action: onToggle) {
+            HStack(spacing: 12) {
                 Image(systemName: item.isPurchased ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
                     .foregroundStyle(tint)
-            }
-            .buttonStyle(.borderless)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.name)
-                    .strikethrough(item.isPurchased)
-                    .foregroundStyle(item.isPurchased ? .secondary : .primary)
-                if !item.quantity.isEmpty {
-                    Text(item.quantity)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.name)
+                        .strikethrough(item.isPurchased)
+                        .foregroundStyle(item.isPurchased ? .secondary : .primary)
+                    if !item.quantity.isEmpty {
+                        Text(item.quantity)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+
+                Spacer()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 2)
             .contentShape(Rectangle())
-            .onTapGesture(perform: onEdit)
         }
-        .padding(.vertical, 2)
+        .buttonStyle(.plain)
     }
 }
