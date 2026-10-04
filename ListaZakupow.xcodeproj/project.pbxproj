@@ -10,9 +10,22 @@
 		D0D1BEDB3071030000970CA3 /* ListaZakupow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ListaZakupow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D0ECBCEE3072661900039D59 /* Exceptions for "ListaZakupow" folder in "ListaZakupow" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D0D1BEDA3071030000970CA3 /* ListaZakupow */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D0D1BEDD3071030000970CA3 /* ListaZakupow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D0ECBCEE3072661900039D59 /* Exceptions for "ListaZakupow" folder in "ListaZakupow" target */,
+			);
 			path = ListaZakupow;
 			sourceTree = "<group>";
 		};
@@ -246,6 +259,7 @@
 				DEVELOPMENT_TEAM = 47YTJ3FR2H;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ListaZakupow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Lista zakupów";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -279,6 +293,7 @@
 				DEVELOPMENT_TEAM = 47YTJ3FR2H;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ListaZakupow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Lista zakupów";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
