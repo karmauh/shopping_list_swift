@@ -35,3 +35,13 @@ final class ShoppingList {
         activeItems.filter { $0.isPurchased }.count
     }
 }
+
+extension ShoppingList {
+    func activeItem(named name: String, excluding excluded: ShoppingItem? = nil) -> ShoppingItem? {
+        let key = name.comparisonKey
+        guard !key.isEmpty else { return nil }
+        return activeItems.first {
+            $0.id != excluded?.id && $0.name.comparisonKey == key
+        }
+    }
+}

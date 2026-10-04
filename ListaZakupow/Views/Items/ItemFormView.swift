@@ -54,14 +54,34 @@ struct ItemFormView: View {
         quantity.trimmingCharacters(in: .whitespaces)
     }
 
+    private var duplicate: ShoppingItem? {
+        list.activeItem(named: cleanName, excluding: item)
+    }
+
+    private var isValid: Bool {
+        !cleanName.isEmpty && duplicate == nil
+    }
+
     var body: some View {
         NavigationStack {
             Form {
-                Section("Produkt") {
+                Section {
                     TextField("Nazwa produktu", text: $name)
                         .focused($isNameFocused)
                         .submitLabel(.done)
                     TextField("Ilość (np. 2 szt., 1 kg)", text: $quantity)
+                } header: {
+                    Text("Produkt")
+                } footer: {
+                    duplicateFooter
+                }
+
+                if let duplicate, duplicate.isPurchased, item == nil {
+                    Section {
+                        Button("Przywróć „\(duplicate.name)” na listę") {
+                            restore(duplicate)
+                        }
+                    }
                 }
 
                 Section("Kategoria") {
@@ -89,7 +109,7 @@ struct ItemFormView: View {
                             quantity = ""
                             isNameFocused = true
                         }
-                        .disabled(cleanName.isEmpty)
+                        .disabled(!isValid)
                     }
                 }
             }
@@ -106,7 +126,7 @@ struct ItemFormView: View {
                         persist()
                         dismiss()
                     }
-                    .disabled(cleanName.isEmpty)
+                    .disabled(!isValid)
                 }
             }
             .task {
@@ -119,6 +139,23 @@ struct ItemFormView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var duplicateFooter: some View {
+        if let duplicate {
+            Text(
+                duplicate.isPurchased
+                    ? "Ten produkt jest już na liście jako kupiony."
+                    : "Ten produkt już jest na liście."
+            )
+            .foregroundStyle(.red)
+        }
+    }
+
+    private func restore(_ existing: ShoppingItem) {
+        existing.setPurchased(false)
+        dismiss()
     }
 
     private func persist() {
