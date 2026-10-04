@@ -57,12 +57,9 @@ struct CategoryFormView: View {
     }
 
     private var isDuplicate: Bool {
-        categories.contains { other in
-            other.id != category?.id
-                && other.name.compare(
-                    cleanName,
-                    options: [.caseInsensitive, .diacriticInsensitive]
-                ) == .orderedSame
+        let key = cleanName.comparisonKey
+        return categories.contains { other in
+            other.id != category?.id && other.name.comparisonKey == key
         }
     }
 
