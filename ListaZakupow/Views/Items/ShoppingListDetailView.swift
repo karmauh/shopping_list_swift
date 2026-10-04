@@ -9,14 +9,25 @@ struct ShoppingListDetailView: View {
 
     @State private var formMode: ItemFormMode?
     @State private var showsClearConfirmation = false
+    @State private var searchText = ""
+
+    private var visibleItems: [ShoppingItem] {
+        let key = searchText.comparisonKey
+        guard !key.isEmpty else { return list.activeItems }
+        return list.activeItems.filter { item in
+            item.name.comparisonKey.contains(key)
+                || item.quantity.comparisonKey.contains(key)
+                || (item.category?.name.comparisonKey.contains(key) ?? false)
+        }
+    }
 
     private var sections: [ItemSection] {
-        ItemSection.build(from: list.activeItems, categories: categories)
+        ItemSection.build(from: visibleItems, categories: categories)
     }
 
     var body: some View {
         List {
-            if list.totalCount > 0 {
+            if list.totalCount > 0 && searchText.isEmpty {
                 Section {
                     progressView
                 }
@@ -68,8 +79,15 @@ struct ShoppingListDetailView: View {
                         formMode = .add
                     }
                 }
+            } else if sections.isEmpty && !searchText.isEmpty {
+                ContentUnavailableView.search(text: searchText)
             }
         }
+        .searchable(
+            text: $searchText,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: "Szukaj produktów"
+        )
         .navigationTitle(list.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
