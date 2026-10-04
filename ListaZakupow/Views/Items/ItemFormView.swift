@@ -29,6 +29,8 @@ struct ItemFormView: View {
     @Query(sort: \ProductCategory.sortOrder)
     private var categories: [ProductCategory]
 
+    @Query private var history: [ShoppingItem]
+
     let list: ShoppingList
     private let item: ShoppingItem?
 
@@ -62,6 +64,16 @@ struct ItemFormView: View {
         !cleanName.isEmpty && duplicate == nil
     }
 
+    private var suggestions: [Suggestion] {
+        guard item == nil else { return [] }
+        let activeKeys = Set(list.activeItems.map { $0.name.comparisonKey })
+        return SuggestionService.suggestions(
+            typed: cleanName,
+            history: history,
+            excludingKeys: activeKeys
+        )
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -81,6 +93,33 @@ struct ItemFormView: View {
                         Button("Przywróć „\(duplicate.name)” na listę") {
                             restore(duplicate)
                         }
+                    }
+                }
+
+                let currentSuggestions = suggestions
+                if !currentSuggestions.isEmpty {
+                    Section {
+                        ForEach(currentSuggestions) { suggestion in
+                            Button {
+                                apply(suggestion)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Text(suggestion.name)
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    if let category = category(for: suggestion) {
+                                        Image(systemName: category.symbolName)
+                                            .foregroundStyle(category.categoryColor.color)
+                                    }
+                                    Image(systemName: "arrow.up.left")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .contentShape(Rectangle())
+                            }
+                        }
+                    } header: {
+                        Text(cleanName.isEmpty ? "Często kupowane" : "Podpowiedzi")
                     }
                 }
 
@@ -151,6 +190,19 @@ struct ItemFormView: View {
             )
             .foregroundStyle(.red)
         }
+    }
+
+    private func category(for suggestion: Suggestion) -> ProductCategory? {
+        guard let id = suggestion.categoryID else { return nil }
+        return categories.first { $0.id == id }
+    }
+
+    private func apply(_ suggestion: Suggestion) {
+        name = suggestion.name
+        if let id = suggestion.categoryID, categories.contains(where: { $0.id == id }) {
+            categoryID = id
+        }
+        isNameFocused = true
     }
 
     private func restore(_ existing: ShoppingItem) {

@@ -1,10 +1,19 @@
 import Foundation
 
+struct Suggestion: Identifiable {
+    let name: String
+    let categoryID: UUID?
+
+    var id: String { name.comparisonKey }
+}
+
 enum SuggestionService {
     private struct Entry {
         var name: String
         var count: Int
         var lastUsed: Date
+        var categoryID: UUID?
+        var categoryDate: Date
     }
 
     static func suggestions(
@@ -12,7 +21,7 @@ enum SuggestionService {
         history: [ShoppingItem],
         excludingKeys: Set<String>,
         limit: Int = 5
-    ) -> [String] {
+    ) -> [Suggestion] {
         let typedKey = typed.comparisonKey
         var entries: [String: Entry] = [:]
 
@@ -20,16 +29,24 @@ enum SuggestionService {
             let key = item.name.comparisonKey
             guard !key.isEmpty, !excludingKeys.contains(key), key != typedKey else { continue }
 
-            if var entry = entries[key] {
-                entry.count += 1
-                if item.createdAt > entry.lastUsed {
-                    entry.lastUsed = item.createdAt
-                    entry.name = item.name
-                }
-                entries[key] = entry
-            } else {
-                entries[key] = Entry(name: item.name, count: 1, lastUsed: item.createdAt)
+            var entry = entries[key] ?? Entry(
+                name: item.name,
+                count: 0,
+                lastUsed: .distantPast,
+                categoryID: nil,
+                categoryDate: .distantPast
+            )
+
+            entry.count += 1
+            if item.createdAt > entry.lastUsed {
+                entry.lastUsed = item.createdAt
+                entry.name = item.name
             }
+            if let categoryID = item.category?.id, item.updatedAt >= entry.categoryDate {
+                entry.categoryID = categoryID
+                entry.categoryDate = item.updatedAt
+            }
+            entries[key] = entry
         }
 
         let matching = entries.filter { typedKey.isEmpty || $0.key.contains(typedKey) }
@@ -49,6 +66,8 @@ enum SuggestionService {
             return lhs.key < rhs.key
         }
 
-        return sorted.prefix(limit).map { $0.value.name }
+        return sorted.prefix(limit).map {
+            Suggestion(name: $0.value.name, categoryID: $0.value.categoryID)
+        }
     }
 }
