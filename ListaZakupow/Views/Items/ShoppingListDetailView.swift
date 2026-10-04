@@ -92,6 +92,19 @@ struct ShoppingListDetailView: View {
                     Label("Dodaj produkt", systemImage: "plus")
                 }
                 Menu {
+                    ShareLink(
+                        item: ListSharing.makeDocument(from: list),
+                        preview: SharePreview(list.name)
+                    ) {
+                        Label("Udostępnij listę (plik)", systemImage: "square.and.arrow.up")
+                    }
+
+                    ShareLink(item: ListSharing.plainText(for: list, categories: categories)) {
+                        Label("Udostępnij jako tekst", systemImage: "text.alignleft")
+                    }
+
+                    Divider()
+
                     Button("Odznacz wszystkie kupione", systemImage: "arrow.uturn.backward.circle") {
                         withAnimation {
                             for item in list.activeItems where item.isPurchased {
