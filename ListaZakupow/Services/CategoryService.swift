@@ -18,12 +18,13 @@ enum CategoryService {
         return created
     }
 
+    @discardableResult
     static func insert(
         name: String,
         symbolName: String,
         colorName: String,
         in context: ModelContext
-    ) {
+    ) -> ProductCategory {
         var ordered = fetchSorted(in: context)
         let category = ProductCategory(
             name: name,
@@ -38,6 +39,7 @@ enum CategoryService {
         for (position, item) in ordered.enumerated() {
             item.sortOrder = position
         }
+        return category
     }
 
     static func delete(_ category: ProductCategory, in context: ModelContext) {
