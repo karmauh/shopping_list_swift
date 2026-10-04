@@ -9,6 +9,7 @@ struct ShoppingListsView: View {
 
     @State private var formMode: ListFormMode?
     @State private var showsCategories = false
+    @State private var showsSettings = false
     @State private var selectedList: ShoppingList?
     @State private var highlightedID: UUID?
     @State private var removingIDs: Set<UUID> = []
@@ -54,11 +55,16 @@ struct ShoppingListsView: View {
         }
         .navigationTitle("Listy zakupów")
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItemGroup(placement: .topBarLeading) {
                 Button {
                     showsCategories = true
                 } label: {
                     Label("Kategorie", systemImage: "tag")
+                }
+                Button {
+                    showsSettings = true
+                } label: {
+                    Label("Ustawienia", systemImage: "gearshape")
                 }
             }
             ToolbarItem(placement: .primaryAction) {
@@ -74,6 +80,9 @@ struct ShoppingListsView: View {
         }
         .navigationDestination(isPresented: $showsCategories) {
             CategoriesView()
+        }
+        .navigationDestination(isPresented: $showsSettings) {
+            SettingsView()
         }
         .sheet(item: $formMode) { mode in
             ListFormView(mode: mode)
