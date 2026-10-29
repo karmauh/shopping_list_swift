@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(ImportCoordinator.self) private var coordinator
+    @StateObject private var tester = ConnectionTester()
 
     @AppStorage(AppSettings.mergeWithoutAskingKey)
     private var mergeWithoutAsking = false
@@ -19,6 +20,15 @@ struct SettingsView: View {
                 Text("Odbieranie list")
             } footer: {
                 Text("Gdy opcja jest włączona, otrzymana lista jest od razu scalana z Twoją, a po zakończeniu zobaczysz podsumowanie. Gdy jest wyłączona, przed scaleniem zobaczysz podgląd zmian i możesz zapisać listę jako nową.")
+            }
+            
+            Section("Test Firebase") {
+                Button("Sprawdź połączenie") {
+                    Task { await tester.run() }
+                }
+                .disabled(tester.isRunning)
+                Text(tester.status)
+                    .font(.footnote)
             }
 
             Section {

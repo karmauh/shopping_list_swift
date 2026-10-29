@@ -6,6 +6,11 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D09985043093506100FAE01B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D09985033093506100FAE01B /* FirebaseAuth */; };
+		D09985063093506100FAE01B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = D09985053093506100FAE01B /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D0D1BEDB3071030000970CA3 /* ListaZakupow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ListaZakupow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -35,6 +40,8 @@
 		D0D1BED83071030000970CA3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				D09985043093506100FAE01B /* FirebaseAuth in Frameworks */,
+				D09985063093506100FAE01B /* FirebaseFirestore in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -73,6 +80,10 @@
 				D0D1BEDD3071030000970CA3 /* ListaZakupow */,
 			);
 			name = ListaZakupow;
+			packageProductDependencies = (
+				D09985033093506100FAE01B /* FirebaseAuth */,
+				D09985053093506100FAE01B /* FirebaseFirestore */,
+			);
 			productName = ListaZakupow;
 			productReference = D0D1BEDB3071030000970CA3 /* ListaZakupow.app */;
 			productType = "com.apple.product-type.application";
@@ -101,6 +112,9 @@
 			);
 			mainGroup = D0D1BED23071030000970CA3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D09985023093506100FAE01B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D0D1BEDC3071030000970CA3 /* Products */;
 			projectDirPath = "";
@@ -271,6 +285,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = pl.mikolajbozko.ListaZakupow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -305,6 +320,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = pl.mikolajbozko.ListaZakupow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -337,6 +353,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D09985023093506100FAE01B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D09985033093506100FAE01B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09985023093506100FAE01B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		D09985053093506100FAE01B /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09985023093506100FAE01B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D0D1BED33071030000970CA3 /* Project object */;
 	validationLevel = 1;
