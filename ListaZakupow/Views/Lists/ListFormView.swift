@@ -74,7 +74,11 @@ struct ListFormView: View {
     private func save() {
         if let list {
             list.name = cleanName
+            list.nameUpdatedAt = .now
             list.updatedAt = .now
+            if list.isShared {
+                Task { await SyncService.shared.pushListName(of: list) }
+            }
         } else {
             modelContext.insert(ShoppingList(name: cleanName))
         }

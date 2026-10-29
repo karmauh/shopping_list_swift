@@ -4,12 +4,15 @@ import SwiftData
 struct ShoppingListDetailView: View {
     let list: ShoppingList
 
+    @Environment(\.modelContext) private var modelContext
+
     @Query(sort: \ProductCategory.sortOrder)
     private var categories: [ProductCategory]
 
     @State private var formMode: ItemFormMode?
     @State private var showsClearConfirmation = false
     @State private var searchText = ""
+    @State private var syncMessage: String?
 
     private var visibleItems: [ShoppingItem] {
         let key = searchText.comparisonKey
@@ -103,6 +106,16 @@ struct ShoppingListDetailView: View {
                         Label("Udostępnij jako tekst", systemImage: "text.alignleft")
                     }
 
+                    if list.isShared {
+                        Button("Kod synchronizacji", systemImage: "arrow.triangle.2.circlepath") {
+                            syncMessage = "Kod listy: \(list.shareCode ?? "")"
+                        }
+                    } else {
+                        Button("Włącz synchronizację", systemImage: "arrow.triangle.2.circlepath") {
+                            Task { await enableSync() }
+                        }
+                    }
+
                     Divider()
 
                     Button("Odznacz wszystkie kupione", systemImage: "arrow.uturn.backward.circle") {
@@ -141,6 +154,19 @@ struct ShoppingListDetailView: View {
         } message: {
             Text("Kupione produkty zostaną usunięte z listy.")
         }
+        .onChange(of: list.updatedAt) {
+            if list.isShared {
+                SyncService.shared.requestPush(in: modelContext)
+            }
+        }
+        .alert("Synchronizacja", isPresented: Binding(
+            get: { syncMessage != nil },
+            set: { if !$0 { syncMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(syncMessage ?? "")
+        }
     }
 
     private var progressView: some View {
@@ -168,5 +194,14 @@ struct ShoppingListDetailView: View {
         .font(.headline)
         .foregroundStyle(.primary)
         .textCase(nil)
+    }
+
+    private func enableSync() async {
+        do {
+            let code = try await SyncService.shared.startSharing(list, in: modelContext)
+            syncMessage = "Synchronizacja włączona. Kod listy: \(code)"
+        } catch {
+            syncMessage = "Nie udało się włączyć synchronizacji: \(error.localizedDescription)"
+        }
     }
 }
