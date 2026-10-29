@@ -11,7 +11,8 @@ final class ShoppingItem {
     var createdAt: Date
     var updatedAt: Date
     var deletedAt: Date?
-
+    var syncedUpdatedAt: Date?
+    
     var list: ShoppingList?
     var category: ProductCategory?
 
@@ -41,6 +42,10 @@ final class ShoppingItem {
 }
 
 extension ShoppingItem {
+    var needsSync: Bool {
+        guard let syncedUpdatedAt else { return true }
+        return updatedAt > syncedUpdatedAt
+    }
     func setPurchased(_ purchased: Bool) {
         isPurchased = purchased
         purchasedAt = purchased ? .now : nil

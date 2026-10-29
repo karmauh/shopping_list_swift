@@ -7,7 +7,9 @@ final class ShoppingList {
     var name: String
     var createdAt: Date
     var updatedAt: Date
-
+    var shareCode: String?
+    var nameUpdatedAt: Date?
+    
     @Relationship(deleteRule: .cascade, inverse: \ShoppingItem.list)
     var items: [ShoppingItem] = []
 
@@ -37,6 +39,10 @@ final class ShoppingList {
 }
 
 extension ShoppingList {
+    var isShared: Bool {
+        shareCode != nil
+    }
+
     func activeItem(named name: String, excluding excluded: ShoppingItem? = nil) -> ShoppingItem? {
         let key = name.comparisonKey
         guard !key.isEmpty else { return nil }
