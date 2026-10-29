@@ -152,9 +152,14 @@ final class SyncService {
             "createdAt": Timestamp(date: list.createdAt)
         ])
 
+        let items = list.items
+        for item in items {
+            item.syncedUpdatedAt = nil
+        }
+        try await push(items, toList: code)
+
         list.shareCode = code
         listen(to: code)
-        await pushPending(in: context)
         return code
     }
 
@@ -219,6 +224,7 @@ final class SyncService {
         do {
             try await ensureSignedIn()
         } catch {
+            print("Sync sign-in failed: \(error.localizedDescription)")
             return
         }
         let descriptor = FetchDescriptor<ShoppingList>(
@@ -229,7 +235,11 @@ final class SyncService {
             guard let code = list.shareCode else { continue }
             let pending = list.items.filter { $0.needsSync }
             if pending.isEmpty { continue }
-            await push(pending, toList: code)
+            do {
+                try await push(pending, toList: code)
+            } catch {
+                print("Sync push failed: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -347,7 +357,7 @@ final class SyncService {
         return created
     }
 
-    private func push(_ items: [ShoppingItem], toList code: String) async {
+    private func push(_ items: [ShoppingItem], toList code: String) async throws {
         let collection = database.collection("lists").document(code).collection("items")
         var start = 0
         while start < items.count {
@@ -361,13 +371,9 @@ final class SyncService {
                 batch.setData(fields(for: item), forDocument: collection.document(item.id.uuidString))
                 versions.append((item, item.updatedAt))
             }
-            do {
-                try await batch.commit()
-                for (item, version) in versions {
-                    item.syncedUpdatedAt = version
-                }
-            } catch {
-                continue
+            try await batch.commit()
+            for (item, version) in versions {
+                item.syncedUpdatedAt = version
             }
         }
     }
