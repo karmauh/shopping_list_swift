@@ -10,6 +10,7 @@ struct ShoppingListsView: View {
     @State private var formMode: ListFormMode?
     @State private var showsCategories = false
     @State private var showsSettings = false
+    @State private var showsJoin = false
     @State private var selectedList: ShoppingList?
     @State private var highlightedID: UUID?
     @State private var removingIDs: Set<UUID> = []
@@ -67,7 +68,12 @@ struct ShoppingListsView: View {
                     Label("Ustawienia", systemImage: "gearshape")
                 }
             }
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    showsJoin = true
+                } label: {
+                    Label("Dołącz do listy", systemImage: "person.2")
+                }
                 Button {
                     formMode = .add
                 } label: {
@@ -86,6 +92,9 @@ struct ShoppingListsView: View {
         }
         .sheet(item: $formMode) { mode in
             ListFormView(mode: mode)
+        }
+        .sheet(isPresented: $showsJoin) {
+            JoinListView()
         }
         .onAppear {
             openRowID = nil
@@ -166,6 +175,9 @@ struct ShoppingListsView: View {
         Task {
             try? await Task.sleep(for: .milliseconds(400))
             if let target = lists.first(where: { $0.id == id }) {
+                if let code = target.shareCode {
+                    SyncService.shared.stopListening(code: code)
+                }
                 modelContext.delete(target)
             }
             removingIDs.remove(id)

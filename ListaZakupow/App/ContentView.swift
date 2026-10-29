@@ -3,6 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @State private var coordinator = ImportCoordinator()
 
     private var pendingBinding: Binding<ImportCoordinator.Pending?> {
@@ -41,6 +42,14 @@ struct ContentView: View {
         .environment(coordinator)
         .task {
             DefaultCategories.seedIfNeeded(in: modelContext)
+            await SyncService.shared.start(in: modelContext)
+        }
+        .onChange(of: scenePhase) {
+            if scenePhase == .active {
+                Task {
+                    await SyncService.shared.start(in: modelContext)
+                }
+            }
         }
         .onOpenURL { url in
             coordinator.handle(url: url, context: modelContext)
