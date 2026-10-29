@@ -115,6 +115,16 @@ final class SyncService {
         listeners[code]?.forEach { $0.remove() }
         listeners[code] = nil
     }
+    
+    func stopSharing(_ list: ShoppingList, in context: ModelContext) {
+        guard let code = list.shareCode else { return }
+        stopListening(code: code)
+        for item in list.items {
+            item.syncedUpdatedAt = nil
+        }
+        list.shareCode = nil
+        try? context.save()
+    }
 
     func startSharing(_ list: ShoppingList, in context: ModelContext) async throws -> String {
         if let existing = list.shareCode {

@@ -123,6 +123,11 @@ struct ShoppingListsView: View {
             HStack(spacing: 8) {
                 ShoppingListRow(list: list)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                if list.isShared {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.tertiary)

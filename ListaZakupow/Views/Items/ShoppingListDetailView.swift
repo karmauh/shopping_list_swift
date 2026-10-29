@@ -11,8 +11,8 @@ struct ShoppingListDetailView: View {
 
     @State private var formMode: ItemFormMode?
     @State private var showsClearConfirmation = false
+    @State private var showsSyncInfo = false
     @State private var searchText = ""
-    @State private var syncMessage: String?
 
     private var visibleItems: [ShoppingItem] {
         let key = searchText.comparisonKey
@@ -95,6 +95,17 @@ struct ShoppingListDetailView: View {
                     Label("Dodaj produkt", systemImage: "plus")
                 }
                 Menu {
+                    Button {
+                        showsSyncInfo = true
+                    } label: {
+                        Label(
+                            list.isShared ? "Synchronizacja i kod listy" : "Włącz synchronizację",
+                            systemImage: "arrow.triangle.2.circlepath"
+                        )
+                    }
+
+                    Divider()
+
                     ShareLink(
                         item: ListSharing.makeDocument(from: list),
                         preview: SharePreview(list.name)
@@ -104,16 +115,6 @@ struct ShoppingListDetailView: View {
 
                     ShareLink(item: ListSharing.plainText(for: list, categories: categories)) {
                         Label("Udostępnij jako tekst", systemImage: "text.alignleft")
-                    }
-
-                    if list.isShared {
-                        Button("Kod synchronizacji", systemImage: "arrow.triangle.2.circlepath") {
-                            syncMessage = "Kod listy: \(list.shareCode ?? "")"
-                        }
-                    } else {
-                        Button("Włącz synchronizację", systemImage: "arrow.triangle.2.circlepath") {
-                            Task { await enableSync() }
-                        }
                     }
 
                     Divider()
@@ -139,6 +140,9 @@ struct ShoppingListDetailView: View {
         .sheet(item: $formMode) { mode in
             ItemFormView(list: list, mode: mode)
         }
+        .sheet(isPresented: $showsSyncInfo) {
+            SyncInfoView(list: list)
+        }
         .confirmationDialog(
             "Usunąć kupione produkty?",
             isPresented: $showsClearConfirmation,
@@ -158,14 +162,6 @@ struct ShoppingListDetailView: View {
             if list.isShared {
                 SyncService.shared.requestPush(in: modelContext)
             }
-        }
-        .alert("Synchronizacja", isPresented: Binding(
-            get: { syncMessage != nil },
-            set: { if !$0 { syncMessage = nil } }
-        )) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(syncMessage ?? "")
         }
     }
 
@@ -194,14 +190,5 @@ struct ShoppingListDetailView: View {
         .font(.headline)
         .foregroundStyle(.primary)
         .textCase(nil)
-    }
-
-    private func enableSync() async {
-        do {
-            let code = try await SyncService.shared.startSharing(list, in: modelContext)
-            syncMessage = "Synchronizacja włączona. Kod listy: \(code)"
-        } catch {
-            syncMessage = "Nie udało się włączyć synchronizacji: \(error.localizedDescription)"
-        }
     }
 }
